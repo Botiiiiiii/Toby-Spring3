@@ -9,7 +9,7 @@ class UserDaoTest {
     @Test
     void addAndSelect() {
         UserDao userDao = new UserDao();
-        String id = "10";
+        String id = "9";
         userDao.add(new User(id,"test","1234"));
         User user = userDao.findById(id);
     }
