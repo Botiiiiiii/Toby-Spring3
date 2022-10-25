@@ -11,9 +11,12 @@ import java.util.Map;
 
 public class UserDao {
     private DataSource dataSource;
+    private JdbcContext jdbcContext;
+
 
     public UserDao(DataSource dataSource) {
         this.dataSource = dataSource;
+        this.jdbcContext = new JdbcContext(dataSource);
     }
 
     public void jdbcContextWithStatemnetStrategy(StatementStrategy stmt) throws SQLException{
@@ -21,7 +24,6 @@ public class UserDao {
         PreparedStatement ps = null;
         try {
             c = dataSource.getConnection();
-            StatementStrategy strategy = new DeleteAllStatment();
             ps = stmt.makePreparedStatement(c);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -86,7 +88,7 @@ public class UserDao {
         }
     }
 
-    public void add(User user) throws SQLException {
+    public void add(final User user) throws SQLException {
         jdbcContextWithStatemnetStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
