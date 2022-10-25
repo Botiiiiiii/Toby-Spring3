@@ -12,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
@@ -40,5 +41,8 @@ class UserDaoTest {
         this.userDao.add(this.user1);
         User test = this.userDao.findById(this.user1.getId());
         Assertions.assertEquals(this.user1.getId(), test.getId());
+
+        List<User> users0 = userDao.getAll();
+        Assertions.assertEquals(users0.size(),0);
     }
 }
