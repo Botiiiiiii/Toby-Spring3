@@ -19,32 +19,9 @@ public class UserDao {
         this.jdbcContext = new JdbcContext(dataSource);
     }
 
-    public void jdbcContextWithStatemnetStrategy(StatementStrategy stmt) throws SQLException{
-        Connection c = null;
-        PreparedStatement ps = null;
-        try {
-            c = dataSource.getConnection();
-            ps = stmt.makePreparedStatement(c);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (ps != null) {
-                try{
-                    ps.close();
-                } catch (SQLException e){
-                }
-            }
-            if (c != null){
-                try {
-                    c.close();
-                }catch (SQLException e){
-                }
-            }
-        }
-    }
+
     public void deleteAll() throws SQLException {
-        jdbcContextWithStatemnetStrategy(new StatementStrategy() {
+       this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                 PreparedStatement ps = c.prepareStatement("delete from users");
@@ -89,7 +66,7 @@ public class UserDao {
     }
 
     public void add(final User user) throws SQLException {
-        jdbcContextWithStatemnetStrategy(new StatementStrategy() {
+        this.jdbcContext.workWithStatementStrategy(new StatementStrategy() {
             @Override
             public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
                 PreparedStatement ps = c.prepareStatement("INSERT INTO users(id,name,password) values(?, ?, ?)");
