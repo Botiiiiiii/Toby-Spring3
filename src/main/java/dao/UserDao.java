@@ -4,21 +4,23 @@ package dao;
 import domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import javax.sql.DataSource;
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.Map;
 
 public class UserDao {
-    private ConnectionMaker connectionMaker;
+    private DataSource dataSource;
 
-    public UserDao(ConnectionMaker connectionMaker) {
-        this.connectionMaker = connectionMaker;
+    public UserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public void jdbcContextWithStatemnetStrategy(StatementStrategy stmt) throws SQLException{
         Connection c = null;
         PreparedStatement ps = null;
         try {
-            c = connectionMaker.makeConnection();
+            c = dataSource.getConnection();
             StatementStrategy strategy = new DeleteAllStatment();
             ps = stmt.makePreparedStatement(c);
             ps.executeUpdate();
@@ -50,7 +52,7 @@ public class UserDao {
         ResultSet rs = null;
         int count = 0;
         try {
-            c = connectionMaker.makeConnection();
+            c = dataSource.getConnection();
             ps = c.prepareStatement("select count(*) from users");
             rs = ps.executeQuery();
             rs.next();
@@ -85,10 +87,8 @@ public class UserDao {
     }
 
     public User findById(String id) {
-        Map<String, String> env = System.getenv();
         try {
-
-            Connection c = connectionMaker.makeConnection();
+            Connection c = dataSource.getConnection();
 
             PreparedStatement pstmt = c.prepareStatement("SELECT * FROM users WHERE id = ?");
             pstmt.setString(1, id);
