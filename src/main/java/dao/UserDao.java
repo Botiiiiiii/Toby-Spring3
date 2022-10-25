@@ -14,12 +14,13 @@ public class UserDao {
         this.connectionMaker = connectionMaker;
     }
 
-    public void deleteAll() throws SQLException {
+    public void jdbcContextWithStatemnetStrategy(StatementStrategy stmt) throws SQLException{
         Connection c = null;
         PreparedStatement ps = null;
         try {
             c = connectionMaker.makeConnection();
-            ps = c.prepareStatement("delete from users");
+            StatementStrategy strategy = new DeleteAllStatment();
+            ps = stmt.makePreparedStatement(c);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -37,6 +38,10 @@ public class UserDao {
                 }
             }
         }
+    }
+    public void deleteAll() throws SQLException {
+        StatementStrategy st = new DeleteAllStatment();
+        jdbcContextWithStatemnetStrategy(st);
     }
 
     public int getCount() throws SQLException, ClassNotFoundException {
@@ -74,25 +79,9 @@ public class UserDao {
         }
     }
 
-    public void add(User user) {
-        try {
-            Map<String, String> env = System.getenv();
-
-            Connection c = connectionMaker.makeConnection();
-
-            PreparedStatement pstmt = c.prepareStatement("INSERT INTO users(id, name, password) VALUES(?,?,?);");
-            pstmt.setString(1, user.getId());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getPassword());
-
-            pstmt.executeUpdate();
-
-            pstmt.close();
-            c.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public void add(User user) throws SQLException {
+        StatementStrategy st = new AddStatement(user);
+        jdbcContextWithStatemnetStrategy(st);
     }
 
     public User findById(String id) {
